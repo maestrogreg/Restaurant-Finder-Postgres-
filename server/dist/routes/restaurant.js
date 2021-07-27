@@ -1,0 +1,11 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+var express_1 = require("express");
+var restaurant_1 = require("../controllers/restaurant");
+var route = express_1.Router();
+route.get('/', restaurant_1.getRestaurants);
+route.get('/:id', restaurant_1.getRestaurant);
+route.post('/', restaurant_1.createRestaurant);
+route.put('/:id', restaurant_1.updateRestaurant);
+route.delete('/:id', restaurant_1.deleteRestaurant);
+exports.default = route;
