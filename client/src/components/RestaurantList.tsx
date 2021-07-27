@@ -1,6 +1,38 @@
-import React from 'react'
+/* eslint-disable react-hooks/exhaustive-deps */
+import React, { useEffect, useContext } from 'react';
+import axiosInstance from '../apis/RestaurantFinder';
+import { RestaurantContext } from '../context/RestaurantContext';
 
-const RestaurantList = () => {
+interface Restaurant{
+    name: string,
+    location: string,
+    price_range: number,
+    id: number
+}
+
+const RestaurantList = (props: any) => {
+    const { restaurants, setRestaurants } = useContext(RestaurantContext);
+    const getRestaurants = async () => {
+        try {
+
+            const result = await axiosInstance.get('/');
+            const restaurantsArray = result.data.data.restaurants;
+            setRestaurants(restaurantsArray);
+        } catch (error) {
+            console.log(error);
+        }
+    }
+    const handleDelete = async(id: number) =>{
+        try {
+            await axiosInstance.delete(`/${id}`);
+            setRestaurants(restaurants.filter((restaurant:Restaurant) => restaurant.id !== id))
+        } catch (error) {
+            
+        }
+    }
+    useEffect(() => {
+        getRestaurants();
+    }, [])
     return (
         <div className="list-group">
             <table className="table table-hover table-dark">
@@ -15,22 +47,20 @@ const RestaurantList = () => {
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td>Mr Biggs</td>
-                        <td>Lagos</td>
-                        <td>$$$</td>
-                        <td>Rating</td>
-                        <td><button className="btn btn-warning">Update</button></td>
-                        <td><button className="btn btn-danger">Delete</button></td>
-                    </tr>
-                    <tr>
-                        <td>Mr Biggs</td>
-                        <td>Lagos</td>
-                        <td>$$$</td>
-                        <td>Rating</td>
-                        <td><button className="btn btn-warning">Update</button></td>
-                        <td><button className="btn btn-danger">Delete</button></td>
-                    </tr>
+                    {restaurants && restaurants.map((restaurant:Restaurant) => {
+                        return (
+                            <tr key={restaurant.id}>
+                                <td>{restaurant.name}</td>
+                                <td>{restaurant.location}</td>
+                                <td>{'$'.repeat(restaurant.price_range)}</td>
+                                <td>Rating</td>
+                                <td><button className="btn btn-warning">Update</button></td>
+                                <td><button onClick={() => handleDelete(restaurant.id)} className="btn btn-danger">Delete</button></td>
+                            </tr>
+
+                        )
+
+                    })}
                 </tbody>
             </table>
         </div>
