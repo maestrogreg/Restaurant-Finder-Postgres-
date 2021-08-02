@@ -11,7 +11,7 @@ To start the server only run;
 ```
 yarn start
 ```
-To start both the client and start concurrently run;
+To start both the client and server concurrently run;
 ```
 yarn dev
 ```
