@@ -1,9 +1,11 @@
 import React from 'react'
+import Updaterestaurant from '../components/UpdateRestaurant';
 
 const UpdateRestaurant = () => {
     return (
         <div>
-            UpdateRestaurant
+            <h1 className="text-center">Update Restaurant</h1>
+            <Updaterestaurant />
         </div>
     )
 }

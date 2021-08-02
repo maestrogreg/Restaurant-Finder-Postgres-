@@ -39,7 +39,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteRestaurant = exports.updateRestaurant = exports.createRestaurant = exports.getRestaurant = exports.getRestaurants = void 0;
+exports.addReview = exports.deleteRestaurant = exports.updateRestaurant = exports.createRestaurant = exports.getRestaurant = exports.getRestaurants = void 0;
 var data_1 = __importDefault(require("../database/data"));
 var getRestaurants = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var results, error_1;
@@ -51,6 +51,7 @@ var getRestaurants = function (req, res) { return __awaiter(void 0, void 0, void
             case 1:
                 results = _a.sent();
                 // console.log(results);
+                console.log('reached1');
                 res.status(200).json({
                     status: 'success',
                     results: results.rows.length,
@@ -68,30 +69,37 @@ var getRestaurants = function (req, res) { return __awaiter(void 0, void 0, void
 }); };
 exports.getRestaurants = getRestaurants;
 var getRestaurant = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var result, error_2;
+    var restaurant, reviews, error_2;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
-                _a.trys.push([0, 2, , 3]);
-                return [4 /*yield*/, data_1.default.query('select * from restaurants where id = $1', [req.params.id])];
+                console.log('reached');
+                _a.label = 1;
             case 1:
-                result = _a.sent();
-                // console.log(result);
-                if (result.rows.length < 1) {
-                    return [2 /*return*/, res.status(404).json({ status: 'error', error: 'user not found' })];
+                _a.trys.push([1, 4, , 5]);
+                return [4 /*yield*/, data_1.default.query('select * from restaurants where id = $1', [req.params.id])];
+            case 2:
+                restaurant = _a.sent();
+                if (restaurant.rows.length < 1) {
+                    return [2 /*return*/, res.status(404).json({ status: 'error', error: 'restaurant not found' })];
                 }
+                return [4 /*yield*/, data_1.default.query('select * from reviews where restaurant_id = $1', [req.params.id])];
+            case 3:
+                reviews = _a.sent();
+                console.log(reviews);
                 res.status(200).json({
                     status: 'success',
                     data: {
-                        restaurants: result.rows[0]
+                        restaurants: restaurant.rows[0],
+                        reviews: reviews.rows
                     }
                 });
-                return [3 /*break*/, 3];
-            case 2:
+                return [3 /*break*/, 5];
+            case 4:
                 error_2 = _a.sent();
                 res.status(404).json({ status: 'error', error: error_2.message });
-                return [3 /*break*/, 3];
-            case 3: return [2 /*return*/];
+                return [3 /*break*/, 5];
+            case 5: return [2 /*return*/];
         }
     });
 }); };
@@ -168,3 +176,28 @@ var deleteRestaurant = function (req, res) { return __awaiter(void 0, void 0, vo
     });
 }); };
 exports.deleteRestaurant = deleteRestaurant;
+var addReview = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var restaurant_id, _a, name_3, review, rating, newReview, error_5;
+    return __generator(this, function (_b) {
+        switch (_b.label) {
+            case 0:
+                _b.trys.push([0, 2, , 3]);
+                restaurant_id = req.params.id;
+                _a = req.body, name_3 = _a.name, review = _a.review, rating = _a.rating;
+                return [4 /*yield*/, data_1.default.query('INSERT INTO reviews (restaurant_id, name, review, rating) VALUES ($1, $2, $3, $4) returning *', [restaurant_id, name_3, review, rating])];
+            case 1:
+                newReview = _b.sent();
+                res.status(201).json({
+                    status: 'success',
+                    review: newReview.rows[0]
+                });
+                return [3 /*break*/, 3];
+            case 2:
+                error_5 = _b.sent();
+                res.status(400).json({ status: 'error', error: error_5.message });
+                return [3 /*break*/, 3];
+            case 3: return [2 /*return*/];
+        }
+    });
+}); };
+exports.addReview = addReview;

@@ -5,7 +5,7 @@ export const getRestaurants = async(req: Request, res: Response) =>{
     try{
         const results = await db.query('select * from restaurants');
         // console.log(results);
-        
+        console.log('reached1')
         res.status(200).json({
             status: 'success',
             results: results.rows.length,
@@ -21,16 +21,21 @@ export const getRestaurants = async(req: Request, res: Response) =>{
 }
 
 export const getRestaurant = async(req: Request, res: Response) =>{
+    console.log('reached')
     try {
-        const result = await db.query('select * from restaurants where id = $1', [req.params.id]);
-        // console.log(result);
-        if(result.rows.length < 1){
-            return res.status(404).json({status:'error', error:'user not found'});
+        const restaurant = await db.query('select * from restaurants where id = $1', [req.params.id]);
+        
+        if(restaurant.rows.length < 1){
+            return res.status(404).json({status:'error', error:'restaurant not found'});
         }
+        const reviews = await db.query('select * from reviews where restaurant_id = $1', [req.params.id]);
+        console.log(reviews);
+
         res.status(200).json({
             status: 'success',
             data: {
-                restaurants: result.rows[0]
+                restaurants: restaurant.rows[0],
+                reviews: reviews.rows
             }
             
         })
@@ -82,6 +87,20 @@ export const deleteRestaurant = async(req: Request, res: Response) => {
             status: 'success',
             message: 'restaurant successfully deleted'
             
+        })
+    } catch (error) {
+        res.status(400).json({status:'error', error:error.message});
+    }
+}
+
+export const addReview = async(req: Request, res: Response) => {
+    try {
+        const restaurant_id = req.params.id;
+        const {name, review, rating} = req.body;
+        const newReview = await db.query('INSERT INTO reviews (restaurant_id, name, review, rating) VALUES ($1, $2, $3, $4) returning *', [restaurant_id, name, review, rating]);
+        res.status(201).json({
+            status: 'success',
+            review: newReview.rows[0]
         })
     } catch (error) {
         res.status(400).json({status:'error', error:error.message});

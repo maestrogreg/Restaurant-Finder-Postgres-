@@ -8,4 +8,5 @@ route.get('/:id', restaurant_1.getRestaurant);
 route.post('/', restaurant_1.createRestaurant);
 route.put('/:id', restaurant_1.updateRestaurant);
 route.delete('/:id', restaurant_1.deleteRestaurant);
+route.post('/:id/addReview', restaurant_1.addReview);
 exports.default = route;
