@@ -3,7 +3,7 @@ import db from '../database/data';
 
 export const getRestaurants = async(req: Request, res: Response) =>{
     try{
-        const results = await db.query('select * from restaurants');
+        const results = await db.query('SELECT * FROM restaurants left join (select restaurant_id, COUNT(*), TRUNC(Avg(rating), 1) as average_rating from reviews group by restaurant_id) reviews on restaurants.id = reviews.restaurant_id');
         // console.log(results);
         console.log('reached1')
         res.status(200).json({
@@ -23,7 +23,7 @@ export const getRestaurants = async(req: Request, res: Response) =>{
 export const getRestaurant = async(req: Request, res: Response) =>{
     console.log('reached')
     try {
-        const restaurant = await db.query('select * from restaurants where id = $1', [req.params.id]);
+        const restaurant = await db.query('SELECT * FROM restaurants left join (select restaurant_id, COUNT(*), TRUNC(Avg(rating), 1) as average_rating from reviews group by restaurant_id) reviews on restaurants.id = reviews.restaurant_id where id = $1', [req.params.id]);
         
         if(restaurant.rows.length < 1){
             return res.status(404).json({status:'error', error:'restaurant not found'});

@@ -4,7 +4,10 @@ interface Restaurant{
     name?: string,
     location?: string,
     price_range?: number,
-    id?: number
+    id?: number,
+    restaurant_id?: number,
+    count?: number,
+    average_rating?: number
 }
 interface Review{
     id: number,

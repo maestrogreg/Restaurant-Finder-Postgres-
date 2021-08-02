@@ -3,12 +3,15 @@ import React, { useEffect, useContext } from 'react';
 import { useHistory } from 'react-router-dom';
 import axiosInstance from '../apis/RestaurantFinder';
 import { RestaurantContext } from '../context/RestaurantContext';
+import StarRating from './StarRating';
 
-interface Restaurant{
+interface Restaurant {
     name: string,
     location: string,
     price_range: number,
-    id: number
+    id: number,
+    average_rating: number,
+    count: number
 }
 
 const RestaurantList = (props: any) => {
@@ -24,21 +27,36 @@ const RestaurantList = (props: any) => {
             console.log(error);
         }
     }
-    const handleDelete = async(e: React.SyntheticEvent, id: number) =>{
+    const handleDelete = async (e: React.SyntheticEvent, id: number) => {
         try {
             e.stopPropagation();
             await axiosInstance.delete(`/${id}`);
-            setRestaurants(restaurants.filter((restaurant:Restaurant) => restaurant.id !== id))
+            setRestaurants(restaurants.filter((restaurant: Restaurant) => restaurant.id !== id))
         } catch (error) {
-            
+
         }
     }
-    const handleUpdate = async(e: React.SyntheticEvent, id: number) =>{
+    const handleUpdate = async (e: React.SyntheticEvent, id: number) => {
         e.stopPropagation();
         history.push(`/restaurants/${id}/update`);
     }
-    const handleRestaurantSelect = (id: number) =>{
+    const handleRestaurantSelect = (id: number) => {
         history.push(`/restaurants/${id}`);
+    }
+    const renderRating = (restaurant: Restaurant) => {
+        if(!restaurant.count){
+            return(
+                <span className="text-warning">0 reviews</span>
+            )
+        }else{
+            return (
+                <>
+                    <StarRating rating={restaurant.average_rating} />
+                    <span className="text-warning m-2">({restaurant.count})</span>
+                </>
+            )
+        }
+        
     }
     useEffect(() => {
         getRestaurants();
@@ -57,14 +75,14 @@ const RestaurantList = (props: any) => {
                     </tr>
                 </thead>
                 <tbody>
-                    {restaurants && restaurants.map((restaurant:Restaurant) => {
+                    {restaurants && restaurants.map((restaurant: Restaurant) => {
                         return (
-                            <tr onClick={()=> handleRestaurantSelect(restaurant.id)} key={restaurant.id}>
+                            <tr onClick={() => handleRestaurantSelect(restaurant.id)} key={restaurant.id}>
                                 <td>{restaurant.name}</td>
                                 <td>{restaurant.location}</td>
                                 <td>{'$'.repeat(restaurant.price_range)}</td>
-                                <td>Rating</td>
-                                <td><button onClick={(e) => handleUpdate(e, restaurant.id)}  className="btn btn-warning">Update</button></td>
+                                <td>{renderRating(restaurant)}</td>
+                                <td><button onClick={(e) => handleUpdate(e, restaurant.id)} className="btn btn-warning">Update</button></td>
                                 <td><button onClick={(e) => handleDelete(e, restaurant.id)} className="btn btn-danger">Delete</button></td>
                             </tr>
 

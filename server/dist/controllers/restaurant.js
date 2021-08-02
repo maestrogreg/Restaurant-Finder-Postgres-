@@ -47,7 +47,7 @@ var getRestaurants = function (req, res) { return __awaiter(void 0, void 0, void
         switch (_a.label) {
             case 0:
                 _a.trys.push([0, 2, , 3]);
-                return [4 /*yield*/, data_1.default.query('select * from restaurants')];
+                return [4 /*yield*/, data_1.default.query('SELECT * FROM restaurants left join (select restaurant_id, COUNT(*), TRUNC(Avg(rating), 1) as average_rating from reviews group by restaurant_id) reviews on restaurants.id = reviews.restaurant_id')];
             case 1:
                 results = _a.sent();
                 // console.log(results);
@@ -77,7 +77,7 @@ var getRestaurant = function (req, res) { return __awaiter(void 0, void 0, void 
                 _a.label = 1;
             case 1:
                 _a.trys.push([1, 4, , 5]);
-                return [4 /*yield*/, data_1.default.query('select * from restaurants where id = $1', [req.params.id])];
+                return [4 /*yield*/, data_1.default.query('SELECT * FROM restaurants left join (select restaurant_id, COUNT(*), TRUNC(Avg(rating), 1) as average_rating from reviews group by restaurant_id) reviews on restaurants.id = reviews.restaurant_id where id = $1', [req.params.id])];
             case 2:
                 restaurant = _a.sent();
                 if (restaurant.rows.length < 1) {
